@@ -1,14 +1,24 @@
-import { Input } from "@/components";
+import { Button, Input } from "@/components";
 import { SelectBudgetOptions, SelectTravelerList } from "@/constants/options";
 import { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
+  const [formData, setFormData] = useState([]);
+
+  const handleInputChange = (name, value) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10">
-      <h2 className="font-bold text-3xl">Tell us your travel preferences </h2>
+      <h2 className="font-bold text-3xl">
+        🌲⛺🌲 Tell us your travel preferences 🌲⛺🌲
+      </h2>
       <p className="mt-3 text-gray-500 text-xl">
         just provide some basic information, and out trip planner will create
         your custom plan.
@@ -24,7 +34,7 @@ const CreateTrip = () => {
               place,
               onChange: (v) => {
                 setPlace(v);
-                console.log(v);
+                handleInputChange("destination", v);
               },
             }}
           />
@@ -33,7 +43,11 @@ const CreateTrip = () => {
           <h2 className="text-xl my-3 font-medium">
             How many days are you planning your trip?
           </h2>
-          <Input Placeholder="Ex.3" type="number" />
+          <Input
+            Placeholder="Ex.3"
+            type="number"
+            onChange={(e) => handleInputChange("noOfDays", e.target.value)}
+          />
         </div>
         <div>
           <h2 className="text-xl my-3 font-medium">What is your budged</h2>
@@ -41,7 +55,10 @@ const CreateTrip = () => {
             {SelectBudgetOptions.map((item) => (
               <div
                 key={item.id}
-                className="p-4 border cursor-pointer rounded-lg hover:shadow-lg flex flex-col justify-center items-center"
+                className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg flex flex-col justify-center items-center ${
+                  formData.budget === item.id && "border-blue-500 shadow-lg"
+                }`}
+                onClick={() => handleInputChange("budget", item.id)}
               >
                 <h2 className="mb-4 text-4xl">{item.icon}</h2>
                 <h2 className="font-bold text-lg">{item.title}</h2>
@@ -56,7 +73,11 @@ const CreateTrip = () => {
             {SelectTravelerList.map((item) => (
               <div
                 key={item.id}
-                className="p-4 border cursor-pointer rounded-lg hover:shadow-lg flex flex-col justify-center items-center"
+                className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg flex flex-col justify-center items-center ${
+                  formData.noOfTravelers === item.id &&
+                  "border-blue-500 shadow-lg"
+                }`}
+                onClick={() => handleInputChange("noOfTravelers", item.id)}
               >
                 <h2 className="mb-4 text-4xl">{item.icon}</h2>
                 <h2 className="font-bold text-lg">{item.title}</h2>
@@ -65,6 +86,9 @@ const CreateTrip = () => {
             ))}
           </div>
         </div>
+      </div>
+      <div className="my-10 justify-end  flex">
+        <Button className="mt-10">Create Trip</Button>
       </div>
     </div>
   );
