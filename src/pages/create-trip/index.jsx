@@ -1,5 +1,10 @@
 import { Button, Input } from "@/components";
-import { SelectBudgetOptions, SelectTravelerList } from "@/constants/options";
+import {
+  AI_PROMPT,
+  SelectBudgetOptions,
+  SelectTravelerList,
+} from "@/constants/options";
+import { chatSession } from "@/service/AIModal";
 import { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { toast } from "sonner";
@@ -15,7 +20,7 @@ const CreateTrip = () => {
     });
   };
 
-  const OnClickCreateTrip = () => {
+  const OnClickCreateTrip = async () => {
     if (formData.noOfDays < 1 || formData.noOfDays > 10) {
       toast.warning("The number of days should be between 1 and 10");
       return;
@@ -30,6 +35,18 @@ const CreateTrip = () => {
       return;
     }
 
+    const Final_Prompt = AI_PROMPT(
+      formData.destination.label,
+      formData.noOfDays,
+      SelectTravelerList.find((item) => item.id === formData.noOfTravelers)
+        ?.people,
+      SelectBudgetOptions.find((item) => item.id === formData.budget)?.title
+    );
+
+    console.log(Final_Prompt);
+
+    const result = await chatSession.sendMessage(Final_Prompt);
+    console.log("|  response  |", result?.response?.text());
     toast.success("Trip created successfully");
   };
 
