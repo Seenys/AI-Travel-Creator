@@ -1,5 +1,11 @@
 import { Button, Input } from "@/components";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import {
   AI_PROMPT,
   SelectBudgetOptions,
   SelectTravelerList,
@@ -8,10 +14,12 @@ import { chatSession } from "@/service/AIModal";
 import { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { toast } from "sonner";
+import { FcGoogle } from "react-icons/fc";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleInputChange = (name, value) => {
     setFormData({
@@ -21,6 +29,13 @@ const CreateTrip = () => {
   };
 
   const OnClickCreateTrip = async () => {
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+      setOpenDialog(true);
+      return;
+    }
+
     if (formData.noOfDays < 1 || formData.noOfDays > 10) {
       toast.warning("The number of days should be between 1 and 10");
       return;
@@ -128,6 +143,20 @@ const CreateTrip = () => {
           Create Trip
         </Button>
       </div>
+      <Dialog open={openDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <img src="/logo.svg" />
+              <h2 className="font-bold text-lg mt-7">Sign In With Google</h2>
+              <p> Sign in to the App with Google authentication securely</p>
+              <Button className="mt-5 w-full flex gap-4 items-center">
+                <FcGoogle className="h-7 w-7" /> Sign In With Google{" "}
+              </Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
