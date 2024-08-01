@@ -15,6 +15,8 @@ import { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
@@ -26,6 +28,31 @@ const CreateTrip = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const login = useGoogleLogin({
+    onSuccess: (user) => GetUserProfile(user),
+    onError: (error) => console.log("error", error),
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  });
+
+  const GetUserProfile = (tokenInfo) => {
+    axios
+      .get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo.access_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo.access_token}`,
+            Accept: "application/json",
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        localStorage.setItem("user", JSON.stringify(res.data));
+        setOpenDialog(false);
+        OnClickCreateTrip();
+      });
   };
 
   const OnClickCreateTrip = async () => {
@@ -150,7 +177,10 @@ const CreateTrip = () => {
               <img src="/logo.svg" />
               <h2 className="font-bold text-lg mt-7">Sign In With Google</h2>
               <p> Sign in to the App with Google authentication securely</p>
-              <Button className="mt-5 w-full flex gap-4 items-center">
+              <Button
+                onClick={login}
+                className="mt-5 w-full flex gap-4 items-center"
+              >
                 <FcGoogle className="h-7 w-7" /> Sign In With Google{" "}
               </Button>
             </DialogDescription>
